@@ -17,13 +17,12 @@ app.include_router(wallet.router)
 app.include_router(info.router)
 app.include_router(sessions.router)
 
-
-if __name__ == "__main__":
-    with SessionDep() as session:
-        x = session.get(User, 1)
-        if not x:
-            from demo import usuario_demo, zona_demo_a, zona_demo_b
-            session.add(usuario_demo)
-            session.add(zona_demo_a)
-            session.add(zona_demo_b)
-            session.commit()
+@app.on_event("startup")
+async def startup_event(session: SessionDep):
+    x = session.get(User, 1)
+    if not x:
+        from demo import usuario_demo, zona_demo_a, zona_demo_b
+        session.add(usuario_demo)
+        session.add(zona_demo_a)
+        session.add(zona_demo_b)
+        session.commit()

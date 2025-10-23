@@ -1,12 +1,13 @@
 from fastapi import APIRouter
 from db.models import Vehicle, User, SessionDep
 from fastapi import HTTPException
+from sqlmodel import text
 
 router = APIRouter()
 
 @router.get("/zones")
 async def get_zones(Session: SessionDep) -> list:
-    zones = Session.exec("SELECT * FROM Zone").all()
+    zones = Session.exec(text('SELECT * FROM Zone')).all()
     return zones
 
 @router.post("/vehicles/")
@@ -24,7 +25,7 @@ async def create_vehicle(vehicle: Vehicle, Session: SessionDep) -> Vehicle:
 async def get_vehicles(user_id: int, Session: SessionDep) -> list:
     try:
         vehicles = Session.exec(
-            "SELECT * FROM Vehicle WHERE user_id = :user_id"
+            text("SELECT * FROM Vehicle WHERE user_id = :user_id")
         , {"user_id": user_id}).all()
         return vehicles
     except Exception as e:

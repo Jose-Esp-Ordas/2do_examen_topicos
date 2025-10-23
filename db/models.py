@@ -5,11 +5,13 @@ import datetime
 
 engine = create_engine("sqlite:///database.db")
 db = SQLModel.metadata
+
 def get_session():
     with Session(engine) as session:
         yield session
 
 SessionDep = Annotated[Session, Depends(get_session)]
+
 
 class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)

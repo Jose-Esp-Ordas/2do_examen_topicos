@@ -5,7 +5,7 @@ import datetime
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
-def verify_api_key(x_api_key: str = Header(None)) -> str:
+def verify_api_key(x_api_key: str = Header(None)):
     API_KEY = "testkey"
     if x_api_key != API_KEY:
         raise HTTPException(status_code=401, detail={"Error": "API key inválida/requerida"})
@@ -13,7 +13,7 @@ def verify_api_key(x_api_key: str = Header(None)) -> str:
 
 
 @router.post("/start", dependencies=[Depends(verify_api_key)])
-async def start_parking(session: ParkingSession, Session: SessionDep) -> {Vehicle.plate,Zone.id}:
+async def start_parking(session: ParkingSession, Session: SessionDep):
     active_session = Session.exec(
         f"SELECT * FROM ParkingSession WHERE vehicle_id = {session.vehicle_id} " \
         "AND status = 'active'").all()
@@ -28,7 +28,7 @@ async def start_parking(session: ParkingSession, Session: SessionDep) -> {Vehicl
             "zone_id": session.zone_id, "zona": Session.get(Zone, session.zone_id).name}
 
 @router.post("/stop/{session_id}", dependencies=[Depends(verify_api_key)])
-async def stop_parking(session_id: int, Session: SessionDep) -> ParkingSession:
+async def stop_parking(session_id: int, Session: SessionDep):
     active_session = Session.get(ParkingSession, session_id)
     if active_session.status == "active":
     
@@ -59,7 +59,7 @@ async def stop_parking(session_id: int, Session: SessionDep) -> ParkingSession:
         "La sesión ya ha sido finalizada"})
 
 @router.get("/{session_id}", dependencies=[Depends(verify_api_key)])
-async def get_session_status(session_id: int, Session: SessionDep) -> ParkingSession:
+async def get_session_status(session_id: int, Session: SessionDep):
     parking_session = Session.get(ParkingSession, session_id)
     if not parking_session:
         raise HTTPException(status_code=404, detail={"Detail":
